@@ -43,7 +43,7 @@ jobs:
           (
             echo "=== STEP 1: APT INSTALL ===" && \
             sudo apt-get update && \
-            sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-tools libglslang-dev && \
+            sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-tools glslang-dev && \
             echo "=== STEP 2: SPIRV-HEADERS CLONE & INSTALL ===" && \
             git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers.git /tmp/SPIRV-Headers && \
             cmake -B /tmp/SPIRV-Headers/build -S /tmp/SPIRV-Headers && \
