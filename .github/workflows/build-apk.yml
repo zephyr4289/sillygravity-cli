@@ -29,8 +29,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # Note: For NDK r26b, it is highly recommended to specify `ndkVersion "26.1.10909125"` 
-      # inside your app/build.gradle. Gradle will automatically download and use it.
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.4'
 
       - name: Build Debug APK with NDK
         run: gradle assembleDebug --stacktrace

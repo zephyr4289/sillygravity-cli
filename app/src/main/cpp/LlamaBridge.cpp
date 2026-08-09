@@ -31,7 +31,7 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
     model_params.use_mlock = true; // Prevent weights from being swapped to ZRAM/storage
     model_params.n_gpu_layers = 99; // Maximize Vulkan offload
 
-    g_model = llama_load_model_from_file(path, model_params);
+    g_model = llama_model_load_from_file(path, model_params);
     if (!g_model) {
         LOGE("Model load failed: %s", path);
         env->ReleaseStringUTFChars(modelPath, path);
@@ -44,7 +44,7 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
     ctx_params.type_k = GGML_TYPE_Q8_0; // Force Q8_0 KV Cache to save RAM
     ctx_params.type_v = GGML_TYPE_Q8_0;
 
-    g_ctx = llama_new_context_with_model(g_model, ctx_params);
+    g_ctx = llama_init_from_model(g_model, ctx_params);
     if (!g_ctx) {
         LOGE("Context creation failed.");
         llama_free_model(g_model);
