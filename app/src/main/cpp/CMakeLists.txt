@@ -8,9 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan" FORCE)
 add_compile_definitions(GGML_VULKAN)
 
-# OpenCL fallback
-set(GGML_OPENCL ON CACHE BOOL "Enable OpenCL fallback" FORCE)
-add_compile_definitions(GGML_OPENCL)
+# OpenCL fallback (Disabled because NDK lacks OpenCL headers by default)
+set(GGML_OPENCL OFF CACHE BOOL "Enable OpenCL fallback" FORCE)
 
 # Assume llama.cpp is present in the source tree
 add_subdirectory(llama.cpp)
