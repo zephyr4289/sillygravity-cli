@@ -33,9 +33,9 @@ include_directories(
     ${spirv_headers_SOURCE_DIR}/include
 )
 
-# 4. Write dummy FindSPIRV-Headers.cmake on the fly to satisfy llama.cpp's find_package
+# 4. Generate SPIRV-HeadersConfig.cmake for CMake CONFIG mode
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/cmake_modules")
-file(WRITE "${CMAKE_BINARY_DIR}/cmake_modules/FindSPIRV-Headers.cmake" "
+file(WRITE "${CMAKE_BINARY_DIR}/cmake_modules/SPIRV-HeadersConfig.cmake" "
 set(SPIRV-Headers_FOUND TRUE)
 set(SPIRV_HEADERS_FOUND TRUE)
 set(SPIRV-Headers_INCLUDE_DIRS \"${spirv_headers_SOURCE_DIR}/include\")
@@ -54,8 +54,8 @@ if(NOT TARGET SPIRV-Headers)
 endif()
 ")
 
-# Prepend our custom module path so find_package finds FindSPIRV-Headers.cmake first
-list(PREPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/cmake_modules")
+# Point CMake Config lookup directly to our generated package directory
+set(SPIRV-Headers_DIR "${CMAKE_BINARY_DIR}/cmake_modules" CACHE PATH "" FORCE)
 
 # 5. Enforce Vulkan GPU acceleration
 set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan" FORCE)
