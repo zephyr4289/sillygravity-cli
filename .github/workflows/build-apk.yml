@@ -32,11 +32,8 @@ jobs:
       # Note: For NDK r26b, it is highly recommended to specify `ndkVersion "26.1.10909125"` 
       # inside your app/build.gradle. Gradle will automatically download and use it.
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
       - name: Build Debug APK with NDK
-        run: ./gradlew assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
