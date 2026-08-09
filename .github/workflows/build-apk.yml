@@ -31,10 +31,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Vulkan SDK
+      - name: Setup Vulkan SDK and SPIRV-Headers
         run: |
           sudo apt-get update
-          sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-headers spirv-tools libglslang-dev || sudo apt-get install -y glslang-tools shaderc libvulkan-dev spirv-headers spirv-tools libglslang-dev
+          sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-tools libglslang-dev
+          git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers.git /tmp/SPIRV-Headers
+          cmake -B /tmp/SPIRV-Headers/build -S /tmp/SPIRV-Headers
+          sudo cmake --install /tmp/SPIRV-Headers/build
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
