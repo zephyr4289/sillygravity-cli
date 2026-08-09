@@ -31,23 +31,26 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Vulkan SDK and SPIRV-Headers
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-tools libglslang-dev
-          git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers.git /tmp/SPIRV-Headers
-          cmake -B /tmp/SPIRV-Headers/build -S /tmp/SPIRV-Headers
-          sudo cmake --install /tmp/SPIRV-Headers/build
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.4'
 
-      - name: Build Debug APK with NDK
+      - name: Build Everything and Capture All Logs
         env:
           VULKAN_SDK: /usr
-        run: gradle assembleDebug --stacktrace > build_log.txt 2>&1
+        run: |
+          (
+            echo "=== STEP 1: APT INSTALL ===" && \
+            sudo apt-get update && \
+            sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-tools libglslang-dev && \
+            echo "=== STEP 2: SPIRV-HEADERS CLONE & INSTALL ===" && \
+            git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers.git /tmp/SPIRV-Headers && \
+            cmake -B /tmp/SPIRV-Headers/build -S /tmp/SPIRV-Headers && \
+            sudo cmake --install /tmp/SPIRV-Headers/build && \
+            echo "=== STEP 3: GRADLE ASSEMBLE ===" && \
+            gradle assembleDebug --stacktrace
+          ) > build_log.txt 2>&1
 
       - name: Push log to build-logs branch
         if: always()
