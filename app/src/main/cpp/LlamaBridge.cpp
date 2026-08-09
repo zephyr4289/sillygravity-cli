@@ -28,7 +28,7 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
     }
 
     llama_model_params model_params = llama_model_default_params();
-    model_params.use_mlock = true; // Prevent weights from being swapped to ZRAM/storage
+    model_params.load_mode = LLAMA_LOAD_MODE_MLOCK; // Prevent weights from being swapped to ZRAM/storage
     model_params.n_gpu_layers = 99; // Maximize Vulkan offload
 
     g_model = llama_model_load_from_file(path, model_params);
@@ -47,7 +47,7 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
     g_ctx = llama_init_from_model(g_model, ctx_params);
     if (!g_ctx) {
         LOGE("Context creation failed.");
-        llama_free_model(g_model);
+        llama_model_free(g_model);
         g_model = nullptr;
         env->ReleaseStringUTFChars(modelPath, path);
         return JNI_FALSE;
@@ -61,7 +61,7 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_llm_LLMService_destroyEngine(JNIEnv* env, jobject /* this */) {
     if (g_ctx) { llama_free(g_ctx); g_ctx = nullptr; }
-    if (g_model) { llama_free_model(g_model); g_model = nullptr; }
+    if (g_model) { llama_model_free(g_model); g_model = nullptr; }
     llama_backend_free();
 }
 
