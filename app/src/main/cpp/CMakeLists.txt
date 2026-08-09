@@ -27,13 +27,37 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(spirv_headers)
 
-# Supply Khronos C++ headers to NDK compiler
+# 3. Supply include directories to NDK cross-compiler
 include_directories(
     ${vulkan_headers_SOURCE_DIR}/include
     ${spirv_headers_SOURCE_DIR}/include
 )
 
-# Force Vulkan
+# 4. Write dummy FindSPIRV-Headers.cmake on the fly to satisfy llama.cpp's find_package
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/cmake_modules")
+file(WRITE "${CMAKE_BINARY_DIR}/cmake_modules/FindSPIRV-Headers.cmake" "
+set(SPIRV-Headers_FOUND TRUE)
+set(SPIRV_HEADERS_FOUND TRUE)
+set(SPIRV-Headers_INCLUDE_DIRS \"${spirv_headers_SOURCE_DIR}/include\")
+set(SPIRV_HEADERS_INCLUDE_DIRS \"${spirv_headers_SOURCE_DIR}/include\")
+if(NOT TARGET SPIRV-Headers::SPIRV-Headers)
+    add_library(SPIRV-Headers::SPIRV-Headers INTERFACE IMPORTED GLOBAL)
+    set_target_properties(SPIRV-Headers::SPIRV-Headers PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES \"${spirv_headers_SOURCE_DIR}/include\"
+    )
+endif()
+if(NOT TARGET SPIRV-Headers)
+    add_library(SPIRV-Headers INTERFACE IMPORTED GLOBAL)
+    set_target_properties(SPIRV-Headers PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES \"${spirv_headers_SOURCE_DIR}/include\"
+    )
+endif()
+")
+
+# Prepend our custom module path so find_package finds FindSPIRV-Headers.cmake first
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/cmake_modules")
+
+# 5. Enforce Vulkan GPU acceleration
 set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan" FORCE)
 add_compile_definitions(GGML_VULKAN)
 
