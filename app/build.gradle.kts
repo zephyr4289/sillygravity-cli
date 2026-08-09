@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.llm"
-        minSdk = 26
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -19,7 +19,8 @@ android {
             cmake {
                 cppFlags += "-std=c++17"
                 arguments += listOf(
-                    "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH"
+                    "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH",
+                    "-DANDROID_PLATFORM=android-28"
                 )
             }
         }

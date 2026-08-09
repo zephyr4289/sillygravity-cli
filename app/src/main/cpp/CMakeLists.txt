@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.22.1)
+
+if(ANDROID)
+    set(ANDROID_PLATFORM android-28 CACHE STRING "" FORCE)
+endif()
+
 project(llama-android-bridge)
 
 set(CMAKE_CXX_STANDARD 17)
