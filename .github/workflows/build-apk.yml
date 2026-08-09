@@ -43,12 +43,8 @@ jobs:
           (
             echo "=== STEP 1: APT INSTALL ===" && \
             sudo apt-get update && \
-            sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-tools glslang-dev && \
-            echo "=== STEP 2: SPIRV-HEADERS CLONE & INSTALL ===" && \
-            git clone --depth 1 https://github.com/KhronosGroup/SPIRV-Headers.git /tmp/SPIRV-Headers && \
-            cmake -B /tmp/SPIRV-Headers/build -S /tmp/SPIRV-Headers && \
-            sudo cmake --install /tmp/SPIRV-Headers/build && \
-            echo "=== STEP 3: GRADLE ASSEMBLE ===" && \
+            sudo apt-get install -y glslang-tools glslc libvulkan-dev glslang-dev && \
+            echo "=== STEP 2: GRADLE ASSEMBLE ===" && \
             gradle assembleDebug --stacktrace
           ) > build_log.txt 2>&1
 

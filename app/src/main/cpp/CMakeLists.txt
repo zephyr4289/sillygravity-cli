@@ -10,14 +10,28 @@ list(APPEND CMAKE_PREFIX_PATH "/usr/share/cmake" "/usr/lib/x86_64-linux-gnu/cmak
 
 # Fix missing vulkan/vulkan.hpp in Android NDK sysroot
 include(FetchContent)
+
+# 1. Fetch Vulkan C++ Headers (vulkan/vulkan.hpp)
 FetchContent_Declare(
     vulkan_headers
     GIT_REPOSITORY https://github.com/KhronosGroup/Vulkan-Headers.git
     GIT_TAG        v1.3.296
 )
 FetchContent_MakeAvailable(vulkan_headers)
+
+# 2. Fetch SPIR-V C++ Headers (spirv/unified1/spirv.hpp)
+FetchContent_Declare(
+    spirv_headers
+    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Headers.git
+    GIT_TAG        main
+)
+FetchContent_MakeAvailable(spirv_headers)
+
 # Supply Khronos C++ headers to NDK compiler
-include_directories(${vulkan_headers_SOURCE_DIR}/include)
+include_directories(
+    ${vulkan_headers_SOURCE_DIR}/include
+    ${spirv_headers_SOURCE_DIR}/include
+)
 
 # Force Vulkan
 set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan" FORCE)
