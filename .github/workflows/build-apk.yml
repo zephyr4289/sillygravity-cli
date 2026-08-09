@@ -34,7 +34,7 @@ jobs:
       - name: Setup Vulkan SDK
         run: |
           sudo apt-get update
-          sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-headers || sudo apt-get install -y glslang-tools shaderc libvulkan-dev spirv-headers
+          sudo apt-get install -y glslang-tools glslc libvulkan-dev spirv-headers spirv-tools libglslang-dev || sudo apt-get install -y glslang-tools shaderc libvulkan-dev spirv-headers spirv-tools libglslang-dev
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

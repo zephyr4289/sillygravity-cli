@@ -4,6 +4,10 @@ project(llama-android-bridge)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Allow finding host-installed CMake packages like SPIRV-Headers during cross-compilation
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+list(APPEND CMAKE_PREFIX_PATH "/usr/share/cmake" "/usr/lib/x86_64-linux-gnu/cmake" "/usr/local/share/cmake")
+
 # Force Vulkan and Adreno tuning
 set(GGML_VULKAN ON CACHE BOOL "Enable Vulkan" FORCE)
 add_compile_definitions(GGML_VULKAN)
