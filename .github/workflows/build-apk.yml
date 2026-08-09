@@ -20,11 +20,11 @@ jobs:
           submodules: recursive # Critical for fetching llama.cpp if it's a submodule
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
+          # cache: gradle (Removed until gradle-wrapper.properties is present)
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
