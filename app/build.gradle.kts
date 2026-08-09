@@ -18,6 +18,10 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags += "-std=c++17"
+                arguments += listOf(
+                    "-DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH",
+                    "-DSPIRV-Headers_DIR=/usr/share/cmake/SPIRV-Headers"
+                )
             }
         }
     }
