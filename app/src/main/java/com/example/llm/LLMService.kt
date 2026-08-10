@@ -81,6 +81,14 @@ class LLMService : Service() {
                     return@launch
                 }
                 
+                TerminalLogger.log("[INIT] Checking GPU capabilities...")
+                val hasVulkan = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL)
+                if (hasVulkan) {
+                    TerminalLogger.log("[INIT] Vulkan hardware detected! GPU acceleration enabled.")
+                } else {
+                    TerminalLogger.log("[WARN] Vulkan hardware NOT detected! Performance may be limited.")
+                }
+                
                 TerminalLogger.log("[INIT] Loading model into native C++ memory...")
                 val startTime = System.currentTimeMillis()
                 
