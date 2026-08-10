@@ -106,7 +106,6 @@ class LLMService : Service() {
                 ServerStatus.state.value = ServerState.ERROR
             }
         }
-        startStatsLoop()
     }
 
     private fun startStatsLoop() {
