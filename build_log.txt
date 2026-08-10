@@ -1,17 +1,17 @@
 === STEP 1: APT INSTALL ===
-Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
-Get:6 https://packages.microsoft.com/repos/azure-cli noble InRelease [3564 B]
-Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
-Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
-Get:8 https://dl.google.com/linux/chrome-stable/deb stable InRelease [2548 B]
-Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
-Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
-Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:1 https://packages.microsoft.com/repos/azure-cli noble InRelease [3564 B]
+Get:2 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+Get:3 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Get:4 https://dl.google.com/linux/chrome-stable/deb stable InRelease [2548 B]
+Hit:5 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+Get:6 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:7 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Get:8 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
 Get:9 https://packages.microsoft.com/repos/azure-cli noble/main amd64 Packages [2375 B]
 Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [274 kB]
 Get:11 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.2 kB]
-Get:12 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [643 B]
-Get:13 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [314 kB]
+Get:12 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [314 kB]
+Get:13 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [643 B]
 Get:14 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1403 B]
 Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1184 kB]
 Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [281 kB]
@@ -37,7 +37,7 @@ Get:35 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Pa
 Get:36 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [302 kB]
 Get:37 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [40.3 kB]
 Get:38 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse Translation-en [10.6 kB]
-Fetched 11.2 MB in 1s (7707 kB/s)
+Fetched 11.2 MB in 1s (7733 kB/s)
 Reading package lists...
 Reading package lists...
 Building dependency tree...
@@ -56,7 +56,7 @@ Get:4 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 glslan
 Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 libshaderc1 amd64 2023.8-1build1 [2423 kB]
 Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 glslc amd64 2023.8-1build1 [76.0 kB]
 Get:7 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libvulkan-dev amd64 1.3.275.0-1build1 [1239 kB]
-Fetched 12.0 MB in 2s (5239 kB/s)
+Fetched 12.0 MB in 0s (30.2 MB/s)
 Selecting previously unselected package spirv-tools.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 202954 files and directories currently installed.)
 Preparing to unpack .../0-spirv-tools_2025.1~rc1-1~ubuntu0.24.04.2_amd64.deb ...
@@ -160,6 +160,7 @@ C/C++: CMAKE_BUILD_TYPE=Debug
 > Task :app:processDebugManifestForPackage
 > Task :app:mergeExtDexDebug
 > Task :app:mergeLibDexDebug
+> Task :app:processDebugResources
 > Task :app:buildCMakeDebug[arm64-v8a]
 C/C++: ninja: Entering directory `/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/arm64-v8a'
 C/C++: In file included from /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-vulkan/ggml-vulkan.cpp:22:
@@ -316,74 +317,42 @@ C/C++:     Instance() VULKAN_HPP_NOEXCEPT{};  // = default - try to workaround a
 C/C++:                                     ^~
 C/C++: 50 warnings generated.
 
-> Task :app:configureCMakeDebug[armeabi-v7a]
-C/C++: CMAKE_BUILD_TYPE=Debug
-
-> Task :app:buildCMakeDebug[armeabi-v7a]
-C/C++: ninja: Entering directory `/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a'
-C/C++: /usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi28 --sysroot=/usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -DGGML_USE_LLAMAFILE -DGGML_USE_OPENMP -DGGML_VULKAN -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/vulkan_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/spirv_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/.. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/../include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++17 -fno-limit-debug-info  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -fopenmp=libomp -std=c++17 -MD -MT llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -MF llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o.d -o llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -c /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp
-C/C++: /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:311:12: error: use of undeclared identifier 'vld1q_f16'
-C/C++:     return vld1q_f16((const float16_t *)p);
-C/C++:            ^
-C/C++: /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:314:25: error: use of undeclared identifier 'vld1_f16'
-C/C++:     return vcvt_f32_f16(vld1_f16((const float16_t *)p));
-C/C++:                         ^
-C/C++: 2 errors generated.
-
-> Task :app:buildCMakeDebug[armeabi-v7a] FAILED
+> Task :app:mergeDebugJniLibFolders
+> Task :app:mergeDebugNativeLibs
+> Task :app:validateSigningDebug
+> Task :app:writeDebugAppMetadata
+> Task :app:writeDebugSigningConfigVersions
+> Task :app:stripDebugDebugSymbols
+> Task :app:compileDebugKotlin
+> Task :app:compileDebugJavaWithJavac NO-SOURCE
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics
+> Task :app:processDebugJavaRes
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugJavaResource FAILED
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Execution failed for task ':app:buildCMakeDebug[armeabi-v7a]'.
-> com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a'
-  [0/2] Re-checking globbed directories...
-  [1/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
-  [2/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
-  [3/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
-  [4/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
-  [5/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
-  [6/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
-  [7/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
-  [8/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
-  [9/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
-  [10/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
-  [11/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
-  [12/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
-  [13/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
-  [14/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
-  [15/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
-  [16/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
-  [17/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
-  [18/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
-  [19/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
-  FAILED: llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o 
-  /usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi28 --sysroot=/usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -DGGML_USE_LLAMAFILE -DGGML_USE_OPENMP -DGGML_VULKAN -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/vulkan_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/spirv_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/.. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/../include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++17 -fno-limit-debug-info  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -fopenmp=libomp -std=c++17 -MD -MT llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -MF llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o.d -o llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -c /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp
-  /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:311:12: error: use of undeclared identifier 'vld1q_f16'
-      return vld1q_f16((const float16_t *)p);
-             ^
-  /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:314:25: error: use of undeclared identifier 'vld1_f16'
-      return vcvt_f32_f16(vld1_f16((const float16_t *)p));
-                          ^
-  2 errors generated.
-  [20/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o
-  [21/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
-  [22/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
-  [23/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
-  [24/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
-  ninja: build stopped: subcommand failed.
-  
-  C++ build system [build] failed while executing:
-      /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
-        -C \
-        /home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a \
-        ggml \
-        ggml-base \
-        ggml-cpu \
-        ggml-vulkan \
-        llama \
-        llama-bridge
-    from /home/runner/work/sillygravity-cli/sillygravity-cli/app
+Execution failed for task ':app:mergeDebugJavaResource'.
+> A failure occurred while executing com.android.build.gradle.internal.tasks.MergeJavaResWorkAction
+   > 13 files found with path 'META-INF/io.netty.versions.properties' from inputs:
+      - /home/runner/.gradle/caches/transforms-3/0b31410a5f9120ee9a149cb6a7daa7ec/transformed/jetified-netty-codec-http2-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/2a24f3a745408156f89be6f82c6326d3/transformed/jetified-netty-transport-native-kqueue-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/7849d8a22486c06e203fd8263fe55796/transformed/jetified-netty-transport-native-epoll-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/e7fe4ffdf01018c42d493d6fbbd91326/transformed/jetified-netty-codec-http-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/b03c176bec3139c1abb955f44a2dbdf8/transformed/jetified-netty-handler-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/50163af635807cfdbf97c6808b9bafac/transformed/jetified-netty-codec-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/ce97bcf47c91dc38e5c5ae5dfd9b03a7/transformed/jetified-netty-transport-classes-kqueue-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/141caa6a46ce017a6ab3faf8aa8649ec/transformed/jetified-netty-transport-classes-epoll-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/fea1fd3fffc2094c7e4d381c1a4eb7fb/transformed/jetified-netty-transport-native-unix-common-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/e520df72e4a2b2b4469ac98b37ae8027/transformed/jetified-netty-transport-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/898024cfa06ecfdc1b664568705e698c/transformed/jetified-netty-buffer-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/b42f038bf529e22ff33085243ddbdd4e/transformed/jetified-netty-resolver-4.1.101.Final.jar
+      - /home/runner/.gradle/caches/transforms-3/183cf01aada57ad54230618e90814014/transformed/jetified-netty-common-4.1.101.Final.jar
+     Adding a packagingOptions block may help, please refer to
+     https://developer.android.com/reference/tools/gradle-api/8.2/com/android/build/api/dsl/ResourcesPackagingOptions
+     for more information
 
 * Try:
 > Run with --info or --debug option to get more log output.
@@ -391,7 +360,7 @@ Execution failed for task ':app:buildCMakeDebug[armeabi-v7a]'.
 > Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:buildCMakeDebug[armeabi-v7a]'.
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:mergeDebugJavaResource'.
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:148)
 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:282)
 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:146)
@@ -424,61 +393,18 @@ org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:bui
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
-Caused by: org.gradle.internal.UncheckedException: com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a'
-[0/2] Re-checking globbed directories...
-[1/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
-[2/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
-[3/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
-[4/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
-[5/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
-[6/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
-[7/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
-[8/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
-[9/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
-[10/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
-[11/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
-[12/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
-[13/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
-[14/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
-[15/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
-[16/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
-[17/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
-[18/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
-[19/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
-FAILED: llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o 
-/usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi28 --sysroot=/usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -DGGML_USE_LLAMAFILE -DGGML_USE_OPENMP -DGGML_VULKAN -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/vulkan_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/spirv_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/.. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/../include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++17 -fno-limit-debug-info  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -fopenmp=libomp -std=c++17 -MD -MT llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -MF llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o.d -o llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -c /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp
-/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:311:12: error: use of undeclared identifier 'vld1q_f16'
-    return vld1q_f16((const float16_t *)p);
-           ^
-/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:314:25: error: use of undeclared identifier 'vld1_f16'
-    return vcvt_f32_f16(vld1_f16((const float16_t *)p));
-                        ^
-2 errors generated.
-[20/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o
-[21/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
-[22/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
-[23/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
-[24/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
-ninja: build stopped: subcommand failed.
-
-C++ build system [build] failed while executing:
-    /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
-      -C \
-      /home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a \
-      ggml \
-      ggml-base \
-      ggml-cpu \
-      ggml-vulkan \
-      llama \
-      llama-bridge
-  from /home/runner/work/sillygravity-cli/sillygravity-cli/app
-	at org.gradle.internal.UncheckedException.throwAsUncheckedException(UncheckedException.java:68)
-	at org.gradle.internal.UncheckedException.throwAsUncheckedException(UncheckedException.java:41)
-	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:128)
-	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.doExecute(StandardTaskAction.java:58)
-	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
-	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
-	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:248)
+Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing com.android.build.gradle.internal.tasks.MergeJavaResWorkAction
+	at org.gradle.workers.internal.DefaultWorkerExecutor$WorkItemExecution.waitForCompletion(DefaultWorkerExecutor.java:283)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.lambda$waitForItemsAndGatherFailures$2(DefaultAsyncWorkTracker.java:130)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:336)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:319)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLock(DefaultWorkerLeaseService.java:324)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:126)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:92)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForAll(DefaultAsyncWorkTracker.java:78)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForCompletion(DefaultAsyncWorkTracker.java:66)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:256)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:29)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:26)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
@@ -593,83 +519,69 @@ C++ build system [build] failed while executing:
 	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:380)
 	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
 	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
-Caused by: com.android.ide.common.process.ProcessException: ninja: Entering directory `/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a'
-[0/2] Re-checking globbed directories...
-[1/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o
-[2/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o
-[3/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o
-[4/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o
-[5/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o
-[6/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o
-[7/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o
-[8/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o
-[9/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o
-[10/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o
-[11/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o
-[12/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o
-[13/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o
-[14/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o
-[15/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o
-[16/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o
-[17/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o
-[18/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o
-[19/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o
-FAILED: llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o 
-/usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --target=armv7-none-linux-androideabi28 --sysroot=/usr/local/lib/android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/linux-x86_64/sysroot -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -DGGML_USE_LLAMAFILE -DGGML_USE_OPENMP -DGGML_VULKAN -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/vulkan_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a/_deps/spirv_headers-src/include -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/.. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/. -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu -I/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/../include -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -std=c++17 -fno-limit-debug-info  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -fopenmp=libomp -std=c++17 -MD -MT llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -MF llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o.d -o llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/llamafile/sgemm.cpp.o -c /home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp
-/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:311:12: error: use of undeclared identifier 'vld1q_f16'
-    return vld1q_f16((const float16_t *)p);
-           ^
-/home/runner/work/sillygravity-cli/sillygravity-cli/app/src/main/cpp/llama.cpp/ggml/src/ggml-cpu/llamafile/sgemm.cpp:314:25: error: use of undeclared identifier 'vld1_f16'
-    return vcvt_f32_f16(vld1_f16((const float16_t *)p));
-                        ^
-2 errors generated.
-[20/486] Building C object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o
-[21/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
-[22/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o
-[23/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o
-[24/486] Building CXX object llama.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o
-ninja: build stopped: subcommand failed.
-
-C++ build system [build] failed while executing:
-    /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja \
-      -C \
-      /home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a \
-      ggml \
-      ggml-base \
-      ggml-cpu \
-      ggml-vulkan \
-      llama \
-      llama-bridge
-  from /home/runner/work/sillygravity-cli/sillygravity-cli/app
-	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.execute(ExecuteProcess.kt:288)
-	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt$executeProcess$1.invoke(ExecuteProcess.kt:108)
-	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt$executeProcess$1.invoke(ExecuteProcess.kt:106)
-	at com.android.build.gradle.internal.cxx.timing.TimingEnvironmentKt.time(TimingEnvironment.kt:32)
-	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.executeProcess(ExecuteProcess.kt:106)
-	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.executeProcess$default(ExecuteProcess.kt:85)
-	at com.android.build.gradle.internal.cxx.build.CxxRegularBuilder.executeProcessBatch(CxxRegularBuilder.kt:332)
-	at com.android.build.gradle.internal.cxx.build.CxxRegularBuilder.build(CxxRegularBuilder.kt:129)
-	at com.android.build.gradle.tasks.ExternalNativeBuildTask$doTaskAction$$inlined$recordTaskAction$1.invoke(BaseTask.kt:70)
-	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:51)
-	at com.android.build.gradle.tasks.ExternalNativeBuildTask.doTaskAction(ExternalNativeBuildTask.kt:145)
-	at com.android.build.gradle.internal.tasks.UnsafeOutputsTask$taskAction$$inlined$recordTaskAction$1.invoke(BaseTask.kt:65)
-	at com.android.build.gradle.internal.tasks.Blocks.recordSpan(Blocks.java:51)
-	at com.android.build.gradle.internal.tasks.UnsafeOutputsTask.taskAction(UnsafeOutputsTask.kt:63)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
-	... 118 more
-Caused by: com.android.ide.common.process.ProcessException: Error while executing process /usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja with arguments {-C /home/runner/work/sillygravity-cli/sillygravity-cli/app/.cxx/Debug/3f030233/armeabi-v7a ggml ggml-base ggml-cpu ggml-vulkan llama llama-bridge}
-	at com.android.build.gradle.internal.process.GradleProcessResult.buildProcessException(GradleProcessResult.java:73)
-	at com.android.build.gradle.internal.process.GradleProcessResult.assertNormalExitValue(GradleProcessResult.java:48)
-	at com.android.build.gradle.internal.cxx.process.ExecuteProcessKt.execute(ExecuteProcess.kt:277)
-	... 135 more
-Caused by: org.gradle.process.internal.ExecException: Process 'command '/usr/local/lib/android/sdk/cmake/3.22.1/bin/ninja'' finished with non-zero exit value 1
-	at org.gradle.process.internal.DefaultExecHandle$ExecResultImpl.assertNormalExitValue(DefaultExecHandle.java:431)
-	at com.android.build.gradle.internal.process.GradleProcessResult.assertNormalExitValue(GradleProcessResult.java:46)
-	... 136 more
+Caused by: com.android.builder.merge.DuplicateRelativeFileException: 13 files found with path 'META-INF/io.netty.versions.properties' from inputs:
+ - /home/runner/.gradle/caches/transforms-3/0b31410a5f9120ee9a149cb6a7daa7ec/transformed/jetified-netty-codec-http2-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/2a24f3a745408156f89be6f82c6326d3/transformed/jetified-netty-transport-native-kqueue-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/7849d8a22486c06e203fd8263fe55796/transformed/jetified-netty-transport-native-epoll-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/e7fe4ffdf01018c42d493d6fbbd91326/transformed/jetified-netty-codec-http-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/b03c176bec3139c1abb955f44a2dbdf8/transformed/jetified-netty-handler-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/50163af635807cfdbf97c6808b9bafac/transformed/jetified-netty-codec-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/ce97bcf47c91dc38e5c5ae5dfd9b03a7/transformed/jetified-netty-transport-classes-kqueue-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/141caa6a46ce017a6ab3faf8aa8649ec/transformed/jetified-netty-transport-classes-epoll-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/fea1fd3fffc2094c7e4d381c1a4eb7fb/transformed/jetified-netty-transport-native-unix-common-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/e520df72e4a2b2b4469ac98b37ae8027/transformed/jetified-netty-transport-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/898024cfa06ecfdc1b664568705e698c/transformed/jetified-netty-buffer-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/b42f038bf529e22ff33085243ddbdd4e/transformed/jetified-netty-resolver-4.1.101.Final.jar
+ - /home/runner/.gradle/caches/transforms-3/183cf01aada57ad54230618e90814014/transformed/jetified-netty-common-4.1.101.Final.jar
+Adding a packagingOptions block may help, please refer to
+https://developer.android.com/reference/tools/gradle-api/8.2/com/android/build/api/dsl/ResourcesPackagingOptions
+for more information
+	at com.android.builder.merge.IncrementalFileMergerOutputs$1.create(IncrementalFileMergerOutputs.java:93)
+	at com.android.builder.merge.DelegateIncrementalFileMergerOutput.create(DelegateIncrementalFileMergerOutput.java:65)
+	at com.android.build.gradle.internal.tasks.MergeJavaResourcesDelegate$run$output$1.create(MergeJavaResourcesDelegate.kt:193)
+	at com.android.builder.merge.IncrementalFileMerger.updateChangedFile(IncrementalFileMerger.java:252)
+	at com.android.builder.merge.IncrementalFileMerger.mergeChangedInputs(IncrementalFileMerger.java:213)
+	at com.android.builder.merge.IncrementalFileMerger.merge(IncrementalFileMerger.java:90)
+	at com.android.build.gradle.internal.tasks.MergeJavaResourcesDelegate.run(MergeJavaResourcesDelegate.kt:239)
+	at com.android.build.gradle.internal.tasks.MergeJavaResWorkAction.run(MergeJavaResWorkAction.kt:91)
+	at com.android.build.gradle.internal.profile.ProfileAwareWorkAction.execute(ProfileAwareWorkAction.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:78)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:170)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	... 2 more
+Caused by: com.android.builder.merge.DuplicateRelativeFileException: 13 files found with path 'META-INF/io.netty.versions.properties'.
+Adding a packagingOptions block may help, please refer to
+https://developer.android.com/reference/tools/gradle-api/8.2/com/android/build/api/dsl/ResourcesPackagingOptions
+for more information
+	at com.android.builder.merge.StreamMergeAlgorithms.lambda$acceptOnlyOne$2(StreamMergeAlgorithms.java:75)
+	at com.android.builder.merge.StreamMergeAlgorithms.lambda$select$3(StreamMergeAlgorithms.java:95)
+	at com.android.builder.merge.IncrementalFileMergerOutputs$1.create(IncrementalFileMergerOutputs.java:88)
+	... 37 more
 
 
-BUILD FAILED in 6m 9s
-24 actionable tasks: 24 executed
+BUILD FAILED in 6m 1s
+35 actionable tasks: 35 executed
