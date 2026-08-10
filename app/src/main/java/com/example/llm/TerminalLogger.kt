@@ -10,6 +10,7 @@ object TerminalLogger {
     private val _logs = MutableStateFlow<List<String>>(emptyList())
     val logs = _logs.asStateFlow()
 
+    @JvmStatic
     @Synchronized
     fun log(message: String) {
         if (buffer.size >= MAX_LOGS) {
@@ -19,6 +20,7 @@ object TerminalLogger {
         _logs.value = buffer.toList()
     }
 
+    @JvmStatic
     @Synchronized
     fun clear() {
         buffer.clear()

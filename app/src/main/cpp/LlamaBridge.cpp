@@ -49,10 +49,19 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
         return JNI_ERR;
     }
-    jclass cls = env->FindClass("com/example/llm/TerminalLogger");
-    if (cls) {
-        g_loggerClass = (jclass)env->NewGlobalRef(cls);
-        g_loggerMethodID = env->GetStaticMethodID(g_loggerClass, "log", "(Ljava/lang/String;)V");
+    jclass localClass = env->FindClass("com/example/llm/TerminalLogger");
+    if (env->ExceptionCheck() || localClass == nullptr) {
+        env->ExceptionClear();
+        return JNI_ERR;
+    }
+    
+    g_loggerClass = (jclass)env->NewGlobalRef(localClass);
+    env->DeleteLocalRef(localClass);
+    
+    g_loggerMethodID = env->GetStaticMethodID(g_loggerClass, "log", "(Ljava/lang/String;)V");
+    if (env->ExceptionCheck() || g_loggerMethodID == nullptr) {
+        env->ExceptionClear();
+        return JNI_ERR;
     }
     
     llama_log_set(llama_log_callback, nullptr);
