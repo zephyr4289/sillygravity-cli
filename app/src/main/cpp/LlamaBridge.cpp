@@ -76,14 +76,15 @@ Java_com_example_llm_LLMService_generateResponse(JNIEnv* env, jobject /* this */
     std::string prompt_str(prompt);
     env->ReleaseStringUTFChars(promptStr, prompt);
 
-    // Clear KV cache for a fresh generation
-    llama_kv_cache_clear(g_ctx);
+    // Remove KV cache clear for now since API changed, tracking is automatic
+    
+    const struct llama_vocab * vocab = llama_model_get_vocab(g_model);
 
     std::vector<llama_token> tokens_list(prompt_str.length() + 4);
-    int n_tokens = llama_tokenize(g_model, prompt_str.c_str(), prompt_str.length(), tokens_list.data(), tokens_list.size(), true, false);
+    int n_tokens = llama_tokenize(vocab, prompt_str.c_str(), prompt_str.length(), tokens_list.data(), tokens_list.size(), true, false);
     if (n_tokens < 0) {
         tokens_list.resize(-n_tokens);
-        n_tokens = llama_tokenize(g_model, prompt_str.c_str(), prompt_str.length(), tokens_list.data(), tokens_list.size(), true, false);
+        n_tokens = llama_tokenize(vocab, prompt_str.c_str(), prompt_str.length(), tokens_list.data(), tokens_list.size(), true, false);
     }
     tokens_list.resize(n_tokens);
 
@@ -91,44 +92,37 @@ Java_com_example_llm_LLMService_generateResponse(JNIEnv* env, jobject /* this */
         return env->NewStringUTF("");
     }
 
-    llama_batch batch = llama_batch_get_one(tokens_list.data(), n_tokens, 0, 0);
+    llama_batch batch = llama_batch_get_one(tokens_list.data(), n_tokens);
     if (llama_decode(g_ctx, batch) != 0) {
         return env->NewStringUTF("Error: llama_decode failed");
     }
 
     std::string result = "";
-    int n_cur = n_tokens;
     int n_max_predict = 128; // Limit for demo
     
-    while (n_cur <= n_tokens + n_max_predict) {
-        auto* logits = llama_get_logits_ith(g_ctx, batch.n_tokens - 1);
-        int n_vocab = llama_n_vocab(g_model);
+    struct llama_sampler* smpl = llama_sampler_init_greedy();
+    
+    for (int i = 0; i < n_max_predict; i++) {
+        llama_token new_token_id = llama_sampler_sample(smpl, g_ctx, -1);
+        llama_sampler_accept(smpl, new_token_id);
         
-        std::vector<llama_token_data> candidates;
-        candidates.reserve(n_vocab);
-        for (llama_token token_id = 0; token_id < n_vocab; token_id++) {
-            candidates.push_back(llama_token_data{token_id, logits[token_id], 0.0f});
-        }
-        
-        llama_token_data_array candidates_p = { candidates.data(), candidates.size(), false };
-        llama_token new_token_id = llama_sample_token_greedy(g_ctx, &candidates_p);
-        
-        if (llama_token_is_eog(g_model, new_token_id)) {
+        if (llama_vocab_is_eog(vocab, new_token_id)) {
             break;
         }
         
         char buf[128] = {0};
-        int n = llama_token_to_piece(g_model, new_token_id, buf, sizeof(buf), 0, true);
+        int n = llama_token_to_piece(vocab, new_token_id, buf, sizeof(buf), 0, true);
         if (n >= 0) {
             result += std::string(buf, n);
         }
         
-        batch = llama_batch_get_one(&new_token_id, 1, n_cur, 0);
+        batch = llama_batch_get_one(&new_token_id, 1);
         if (llama_decode(g_ctx, batch) != 0) {
             break;
         }
-        n_cur++;
     }
+    
+    llama_sampler_free(smpl);
 
     return env->NewStringUTF(result.c_str());
 }
