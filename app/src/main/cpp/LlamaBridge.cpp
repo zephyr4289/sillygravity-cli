@@ -13,6 +13,53 @@
 static llama_model* g_model = nullptr;
 static llama_context* g_ctx = nullptr;
 
+static JavaVM* g_jvm = nullptr;
+static jclass g_loggerClass = nullptr;
+static jmethodID g_loggerMethodID = nullptr;
+
+JNIEnv* getJniEnv() {
+    JNIEnv* env = nullptr;
+    if (!g_jvm) return nullptr;
+    int getEnvStat = g_jvm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        g_jvm->AttachCurrentThread(&env, nullptr);
+    }
+    return env;
+}
+
+void llama_log_callback(ggml_log_level level, const char * text, void * user_data) {
+    if (text == NULL || strlen(text) == 0) return;
+    
+    JNIEnv *env = getJniEnv();
+    if (env && g_loggerMethodID && g_loggerClass) {
+        // text from llama.cpp often ends with newline, strip it to prevent double-spacing
+        std::string str(text);
+        if (!str.empty() && str.back() == '\n') {
+            str.pop_back();
+        }
+        jstring jmsg = env->NewStringUTF(str.c_str());
+        env->CallStaticVoidMethod(g_loggerClass, g_loggerMethodID, jmsg);
+        env->DeleteLocalRef(jmsg);
+    }
+}
+
+extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+    g_jvm = vm;
+    JNIEnv* env;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        return JNI_ERR;
+    }
+    jclass cls = env->FindClass("com/example/llm/TerminalLogger");
+    if (cls) {
+        g_loggerClass = (jclass)env->NewGlobalRef(cls);
+        g_loggerMethodID = env->GetStaticMethodID(g_loggerClass, "log", "(Ljava/lang/String;)V");
+    }
+    
+    llama_log_set(llama_log_callback, nullptr);
+    
+    return JNI_VERSION_1_6;
+}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstring modelPath) {
     const char* path = env->GetStringUTFChars(modelPath, 0);

@@ -18,6 +18,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.io.File
+
+enum class ServerState {
+    STOPPED,   // Server is offline
+    STARTING,  // Loading model weights & binding Ktor socket
+    RUNNING,   // Active and listening on 127.0.0.1:8080
+    ERROR      // Model load or port binding failed
+}
+
+object ServerStatus {
+    val state = MutableStateFlow(ServerState.STOPPED)
+}
 
 class LLMService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
@@ -40,16 +53,59 @@ class LLMService : Service() {
             startForeground(1, createNotification("Initializing..."))
         }
         
+        TerminalLogger.log("Foreground service started.")
+        
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LLMService::ExecutionWakelock")
         wakeLock?.acquire(10 * 60 * 1000L /*10 minutes max initially, renew dynamically*/)
 
         val modelPath = getSharedPreferences("app_prefs", MODE_PRIVATE).getString("model_path", "")
         if (modelPath != null && modelPath.isNotEmpty()) {
-            initEngine(modelPath)
+            val file = File(modelPath)
+            startServer(file)
         }
 
-        startLocalServer()
+        startStatsLoop()
+    }
+
+    private fun startServer(modelFile: File) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                ServerStatus.state.value = ServerState.STARTING
+                TerminalLogger.log("----------------------------------------")
+                TerminalLogger.log("[INIT] Starting LLM Foreground Service...")
+                TerminalLogger.log("[INIT] Verifying model file: ${modelFile.name}")
+                if (!modelFile.exists() || modelFile.length() == 0L) {
+                    TerminalLogger.log("[ERROR] GGUF Model file not found or empty!")
+                    ServerStatus.state.value = ServerState.ERROR
+                    return@launch
+                }
+                
+                TerminalLogger.log("[INIT] Loading model into native C++ memory...")
+                val startTime = System.currentTimeMillis()
+                
+                // JNI Model Load Call
+                val success = initEngine(modelFile.absolutePath)
+                if (!success) {
+                    TerminalLogger.log("[ERROR] JNI Native model initialization failed!")
+                    ServerStatus.state.value = ServerState.ERROR
+                    return@launch
+                }
+                
+                val loadTime = System.currentTimeMillis() - startTime
+                TerminalLogger.log("[SUCCESS] Engine loaded successfully in ${loadTime}ms")
+                TerminalLogger.log("[NET] Binding Ktor HTTP Server to 127.0.0.1:8080...")
+                
+                startLocalServer()
+                
+                ServerStatus.state.value = ServerState.RUNNING
+                TerminalLogger.log("[ONLINE] Server active at http://127.0.0.1:8080/v1")
+                TerminalLogger.log("----------------------------------------")
+            } catch (e: Exception) {
+                TerminalLogger.log("[FATAL] Exception while starting server: ${e.localizedMessage}")
+                ServerStatus.state.value = ServerState.ERROR
+            }
+        }
         startStatsLoop()
     }
 
@@ -83,6 +139,9 @@ class LLMService : Service() {
                     val match = promptRegex.findAll(body).lastOrNull()
                     val prompt = match?.groups?.get(1)?.value ?: "Hello!"
                     
+                    TerminalLogger.log("Incoming request: $prompt")
+                    TerminalLogger.log("Generating response...")
+                    
                     val rawResponse = generateResponse(prompt)
                     val responseText = rawResponse.replace("\n", "\\n").replace("\"", "\\\"")
 
@@ -93,9 +152,11 @@ class LLMService : Service() {
                         write("data: [DONE]\n\n")
                         flush()
                     }
+                    TerminalLogger.log("Response sent successfully.")
                 }
             }
         }.start(wait = false)
+        TerminalLogger.log("Ktor Server listening on 127.0.0.1:8080")
     }
 
     private fun createNotification(text: String = "Localhost API running at 127.0.0.1:8080"): Notification {
@@ -117,6 +178,7 @@ class LLMService : Service() {
         ktorServer?.stop(1000, 2000)
         destroyEngine()
         wakeLock?.let { if (it.isHeld) it.release() }
+        ServerStatus.state.value = ServerState.STOPPED
         super.onDestroy()
     }
 

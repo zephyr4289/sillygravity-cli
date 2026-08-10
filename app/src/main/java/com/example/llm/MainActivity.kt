@@ -74,6 +74,7 @@ fun isGgufValid(file: File): Boolean {
 @Composable
 fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
     val context = LocalContext.current
+    val serverState by ServerStatus.state.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var modelUrl by remember { mutableStateOf("https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf") }
     var downloadProgress by remember { mutableStateOf(0f) }
@@ -169,11 +170,52 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
                     else "Download"
                 ) 
             }
+            val buttonText = when (serverState) {
+                ServerState.STOPPED, ServerState.ERROR -> "Start Server"
+                ServerState.STARTING -> "Initializing Engine..."
+                ServerState.RUNNING -> "Stop Server"
+            }
+            val buttonEnabled = when (serverState) {
+                ServerState.STARTING -> false
+                else -> isDownloaded && isGgufValid(targetFile)
+            }
             Button(
-                onClick = onStartService,
-                enabled = isDownloaded && isGgufValid(targetFile)
-            ) { Text("Start Server") }
-            Button(onClick = onStopService) { Text("Stop Server") }
+                onClick = {
+                    if (serverState == ServerState.RUNNING) {
+                        onStopService()
+                    } else {
+                        onStartService()
+                    }
+                },
+                enabled = buttonEnabled
+            ) { Text(buttonText) }
         }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            val dotColor = when (serverState) {
+                ServerState.STOPPED -> Color.Red
+                ServerState.STARTING -> Color.Yellow
+                ServerState.RUNNING -> Color(0xFF00FF66)
+                ServerState.ERROR -> Color.Magenta
+            }
+            val statusText = when (serverState) {
+                ServerState.STOPPED -> "OFFLINE"
+                ServerState.STARTING -> "LOADING MODEL..."
+                ServerState.RUNNING -> "ONLINE (127.0.0.1:8080)"
+                ServerState.ERROR -> "SERVER ERROR"
+            }
+            
+            if (serverState == ServerState.STARTING) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = dotColor, strokeWidth = 2.dp)
+            } else {
+                Box(modifier = Modifier.size(12.dp).background(dotColor, shape = androidx.compose.foundation.shape.CircleShape))
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(statusText, color = dotColor, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        TerminalView()
     }
 }
