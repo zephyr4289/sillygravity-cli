@@ -5,6 +5,7 @@
 #include <sys/mman.h>
 #include <android/log.h>
 #include <vector>
+#include <algorithm>
 #include "llama.h"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "LlamaBridge", __VA_ARGS__)
@@ -72,25 +73,57 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstring modelPath) {
     const char* path = env->GetStringUTFChars(modelPath, 0);
+    std::string pathStr(path);
+    env->ReleaseStringUTFChars(modelPath, path);
     
     llama_backend_init();
 
-    llama_backend_init();
-
     llama_model_params model_params = llama_model_default_params();
-    model_params.load_mode = LLAMA_LOAD_MODE_MMAP; // Allows OS to page weights safely (equiv to use_mmap=true, use_mlock=false)
-    model_params.n_gpu_layers = 99; // Maximize Vulkan offload
+    model_params.load_mode = LLAMA_LOAD_MODE_MMAP; // Allows OS to page weights safely
+    model_params.n_gpu_layers = 99; // Try Vulkan GPU offload first
 
-    g_model = llama_model_load_from_file(path, model_params);
+    LOGI("Attempting model load with Vulkan GPU acceleration...");
+    bool gpuSuccess = false;
+    try {
+        g_model = llama_model_load_from_file(pathStr.c_str(), model_params);
+        if (g_model) {
+            gpuSuccess = true;
+            LOGI("Model loaded successfully with Vulkan GPU offload.");
+        }
+    } catch (const std::exception& e) {
+        LOGE("Vulkan GPU load failed with exception: %s", e.what());
+        g_model = nullptr;
+    } catch (...) {
+        LOGE("Vulkan GPU load failed with unknown C++ exception.");
+        g_model = nullptr;
+    }
+
+    // Gracefully fall back to ARM CPU if Vulkan load failed or threw an exception
     if (!g_model) {
-        LOGE("Model load failed: %s", path);
-        env->ReleaseStringUTFChars(modelPath, path);
+        LOGI("Falling back to CPU model loading...");
+        llama_log_callback(GGML_LOG_LEVEL_WARN, "[WARN] Vulkan GPU offload unsupported or failed. Falling back to CPU inference.", nullptr);
+        
+        model_params.n_gpu_layers = 0; // CPU only
+        try {
+            g_model = llama_model_load_from_file(pathStr.c_str(), model_params);
+        } catch (const std::exception& e) {
+            LOGE("CPU model load failed with exception: %s", e.what());
+            g_model = nullptr;
+        } catch (...) {
+            LOGE("CPU model load failed with unknown exception.");
+            g_model = nullptr;
+        }
+    }
+
+    if (!g_model) {
+        LOGE("Model load failed on both GPU and CPU: %s", pathStr.c_str());
         return JNI_FALSE;
     }
 
     llama_context_params ctx_params = llama_context_default_params();
     ctx_params.n_ctx = 4096; // Constrained context for 6GB RAM devices
-    ctx_params.n_threads = 2; // Match pinned prime cores
+    int hardwareThreads = std::thread::hardware_concurrency();
+    ctx_params.n_threads = (hardwareThreads > 0) ? std::min(4, hardwareThreads) : 4;
     ctx_params.type_k = GGML_TYPE_Q8_0; // Force Q8_0 KV Cache to save RAM
     ctx_params.type_v = GGML_TYPE_Q8_0;
 
@@ -99,12 +132,10 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
         LOGE("Context creation failed.");
         llama_model_free(g_model);
         g_model = nullptr;
-        env->ReleaseStringUTFChars(modelPath, path);
         return JNI_FALSE;
     }
 
-    env->ReleaseStringUTFChars(modelPath, path);
-    LOGI("Llama backend initialized securely in memory.");
+    LOGI("Llama backend initialized successfully (GPU=%s, threads=%d).", gpuSuccess ? "true" : "false", ctx_params.n_threads);
     return JNI_TRUE;
 }
 

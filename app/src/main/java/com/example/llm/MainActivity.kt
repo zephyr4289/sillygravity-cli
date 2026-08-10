@@ -86,13 +86,36 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
     val targetFile = remember { File(context.filesDir, "model.gguf") }
     var isDownloaded by remember { mutableStateOf(targetFile.exists()) }
 
-    // Minimal hardware polling (simulated loop in compose for brevity)
+    fun getDeviceTemperature(): Int {
+        // 1. Try reading battery temp from /sys/class/power_supply/battery/temp
+        try {
+            val battFile = File("/sys/class/power_supply/battery/temp")
+            if (battFile.exists()) {
+                val raw = battFile.readText().trim().toInt()
+                val temp = if (raw > 1000) raw / 100 else if (raw > 100) raw / 10 else raw
+                if (temp in 15..85) return temp
+            }
+        } catch (_: Exception) {}
+
+        // 2. Scan thermal zones 0 through 19 for a valid CPU/SoC thermal reading
+        for (i in 0..19) {
+            try {
+                val f = File("/sys/class/thermal/thermal_zone$i/temp")
+                if (f.exists()) {
+                    val raw = f.readText().trim().toInt()
+                    val temp = if (raw > 1000) raw / 1000 else raw
+                    if (temp in 15..85) return temp
+                }
+            } catch (_: Exception) {}
+        }
+        return 0
+    }
+
     LaunchedEffect(Unit) {
         while (true) {
-            val temp = try {
-                File("/sys/class/thermal/thermal_zone0/temp").readText().trim().toInt() / 1000
-            } catch (e: Exception) { 0 }
-            hardwareStats = "Temp: ${temp}°C | Active Cores: ${Runtime.getRuntime().availableProcessors()}"
+            val temp = getDeviceTemperature()
+            val tempDisplay = if (temp > 0) "${temp}°C" else "N/A"
+            hardwareStats = "Temp: $tempDisplay | Active Cores: ${Runtime.getRuntime().availableProcessors()}"
             kotlinx.coroutines.delay(2000)
         }
     }

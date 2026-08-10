@@ -82,11 +82,13 @@ class LLMService : Service() {
                 }
                 
                 TerminalLogger.log("[INIT] Checking GPU capabilities...")
-                val hasVulkan = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL)
+                val hasVulkanVersion = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_VULKAN_HARDWARE_VERSION)
+                val hasVulkanLevel = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL, 0)
+                val hasVulkan = hasVulkanVersion || hasVulkanLevel
                 if (hasVulkan) {
-                    TerminalLogger.log("[INIT] Vulkan hardware detected! GPU acceleration enabled.")
+                    TerminalLogger.log("[INIT] Vulkan hardware capabilities detected!")
                 } else {
-                    TerminalLogger.log("[WARN] Vulkan hardware NOT detected! Performance may be limited.")
+                    TerminalLogger.log("[WARN] Vulkan hardware feature flag not explicitly reported by system features.")
                 }
                 
                 TerminalLogger.log("[INIT] Loading model into native C++ memory...")
