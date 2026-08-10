@@ -20,6 +20,7 @@ import java.net.URL
 import java.net.HttpURLConnection
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
+import android.widget.Toast
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +64,9 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
     var downloadProgress by remember { mutableStateOf(0f) }
     var hardwareStats by remember { mutableStateOf("Fetching stats...") }
     var isDownloading by remember { mutableStateOf(false) }
+    
+    val targetFile = remember { File(context.filesDir, "model.gguf") }
+    var isDownloaded by remember { mutableStateOf(targetFile.exists()) }
 
     // Minimal hardware polling (simulated loop in compose for brevity)
     LaunchedEffect(Unit) {
@@ -122,16 +126,30 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
                             output.close()
                             input.close()
                             
-                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).edit().putString("model_path", file.absolutePath).apply()
+                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).edit().putString("model_path", targetFile.absolutePath).apply()
+                            
+                            withContext(Dispatchers.Main) {
+                                isDownloaded = true
+                                Toast.makeText(context, "Model downloaded & saved successfully!", Toast.LENGTH_LONG).show()
+                            }
                         } catch (e: Exception) {
                             e.printStackTrace()
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "Download failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
                         } finally {
                             isDownloading = false
                         }
                     }
                 },
-                enabled = !isDownloading
-            ) { Text(if (isDownloading) "Downloading..." else "Download") }
+                enabled = !isDownloading && !isDownloaded
+            ) { 
+                Text(
+                    if (isDownloaded) "Already Downloaded" 
+                    else if (isDownloading) "Downloading..." 
+                    else "Download"
+                ) 
+            }
             Button(onClick = onStartService) { Text("Start Server") }
             Button(onClick = onStopService) { Text("Stop Server") }
         }

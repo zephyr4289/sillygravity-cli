@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 class LLMService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var ktorServer: ApplicationEngine? = null
+    private var statsJob: kotlinx.coroutines.Job? = null
 
     init {
         System.loadLibrary("llama-bridge")
@@ -33,7 +34,11 @@ class LLMService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        startForeground(1, createNotification())
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            startForeground(1, createNotification("Initializing..."), android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(1, createNotification("Initializing..."))
+        }
         
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LLMService::ExecutionWakelock")
@@ -45,6 +50,27 @@ class LLMService : Service() {
         }
 
         startLocalServer()
+        startStatsLoop()
+    }
+
+    private fun startStatsLoop() {
+        val am = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        statsJob = CoroutineScope(Dispatchers.IO).launch {
+            while (true) {
+                val memInfo = android.app.ActivityManager.MemoryInfo()
+                am.getMemoryInfo(memInfo)
+                val availMB = memInfo.availMem / (1024 * 1024)
+                val totalMB = memInfo.totalMem / (1024 * 1024)
+                
+                updateNotification("RAM Free: ${availMB}MB / ${totalMB}MB")
+                delay(3000)
+            }
+        }
+    }
+
+    private fun updateNotification(text: String) {
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.notify(1, createNotification(text))
     }
 
     private fun startLocalServer() {
@@ -72,7 +98,7 @@ class LLMService : Service() {
         }.start(wait = false)
     }
 
-    private fun createNotification(): Notification {
+    private fun createNotification(text: String = "Localhost API running at 127.0.0.1:8080"): Notification {
         val channelId = "llm_service_channel"
         val manager = getSystemService(NotificationManager::class.java)
         val channel = NotificationChannel(channelId, "LLM Engine", NotificationManager.IMPORTANCE_LOW)
@@ -80,13 +106,14 @@ class LLMService : Service() {
 
         return Notification.Builder(this, channelId)
             .setContentTitle("LLM Engine Active")
-            .setContentText("Localhost API running at 127.0.0.1:8080")
+            .setContentText(text)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setOngoing(true)
             .build()
     }
 
     override fun onDestroy() {
+        statsJob?.cancel()
         ktorServer?.stop(1000, 2000)
         destroyEngine()
         wakeLock?.let { if (it.isHeld) it.release() }
