@@ -15,7 +15,11 @@ import androidx.compose.ui.unit.dp
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import java.net.URL
+import java.net.HttpURLConnection
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,9 +57,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var modelUrl by remember { mutableStateOf("https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf") }
     var downloadProgress by remember { mutableStateOf(0f) }
     var hardwareStats by remember { mutableStateOf("Fetching stats...") }
+    var isDownloading by remember { mutableStateOf(false) }
 
     // Minimal hardware polling (simulated loop in compose for brevity)
     LaunchedEffect(Unit) {
@@ -85,7 +92,46 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
         LinearProgressIndicator(progress = downloadProgress, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
         
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(onClick = { /* Launch download coroutine logic */ }) { Text("Download") }
+            Button(
+                onClick = {
+                    if (isDownloading) return@Button
+                    isDownloading = true
+                    coroutineScope.launch(Dispatchers.IO) {
+                        try {
+                            val url = URL(modelUrl)
+                            val connection = url.openConnection() as HttpURLConnection
+                            connection.connect()
+                            val fileLength = connection.contentLength
+                            
+                            val file = File(context.filesDir, "model.gguf")
+                            val input = java.io.BufferedInputStream(url.openStream())
+                            val output = java.io.FileOutputStream(file)
+                            
+                            val data = ByteArray(1024 * 64)
+                            var total: Long = 0
+                            var count: Int
+                            
+                            while (input.read(data).also { count = it } != -1) {
+                                total += count
+                                if (fileLength > 0) {
+                                    downloadProgress = (total.toFloat() / fileLength.toFloat())
+                                }
+                                output.write(data, 0, count)
+                            }
+                            output.flush()
+                            output.close()
+                            input.close()
+                            
+                            context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).edit().putString("model_path", file.absolutePath).apply()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        } finally {
+                            isDownloading = false
+                        }
+                    }
+                },
+                enabled = !isDownloading
+            ) { Text(if (isDownloading) "Downloading..." else "Download") }
             Button(onClick = onStartService) { Text("Start Server") }
             Button(onClick = onStopService) { Text("Stop Server") }
         }
