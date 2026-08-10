@@ -72,6 +72,14 @@ set(GGML_OPENCL OFF CACHE BOOL "Enable OpenCL fallback" FORCE)
 # Assume llama.cpp is present in the source tree
 add_subdirectory(llama.cpp)
 
+if(TARGET ggml-vulkan)
+    target_include_directories(ggml-vulkan PRIVATE
+        ${spirv_headers_SOURCE_DIR}/include
+    )
+else()
+    message(FATAL_ERROR "ggml-vulkan target not found - check target name in ggml-vulkan/CMakeLists.txt for this llama.cpp version")
+endif()
+
 add_library(llama-bridge SHARED LlamaBridge.cpp)
 
 target_include_directories(llama-bridge PRIVATE
