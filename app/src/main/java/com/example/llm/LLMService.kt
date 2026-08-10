@@ -41,7 +41,7 @@ class LLMService : Service() {
         System.loadLibrary("llama-bridge")
     }
 
-    external fun initEngine(modelPath: String): Boolean
+    external fun initEngine(modelPath: String, useGpu: Boolean): Boolean
     external fun destroyEngine()
     external fun generateResponse(prompt: String): String
 
@@ -81,6 +81,7 @@ class LLMService : Service() {
                     return@launch
                 }
                 
+                val useGpu = getSharedPreferences("app_prefs", MODE_PRIVATE).getBoolean("use_gpu", true)
                 TerminalLogger.log("[INIT] Checking GPU capabilities...")
                 val hasVulkanVersion = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_VULKAN_HARDWARE_VERSION)
                 val hasVulkanLevel = packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL, 0)
@@ -91,11 +92,11 @@ class LLMService : Service() {
                     TerminalLogger.log("[WARN] Vulkan hardware feature flag not explicitly reported by system features.")
                 }
                 
-                TerminalLogger.log("[INIT] Loading model into native C++ memory...")
+                TerminalLogger.log("[INIT] Loading model into native C++ memory (Vulkan GPU Enabled: $useGpu)...")
                 val startTime = System.currentTimeMillis()
                 
                 // JNI Model Load Call
-                val success = initEngine(modelFile.absolutePath)
+                val success = initEngine(modelFile.absolutePath, useGpu)
                 if (!success) {
                     TerminalLogger.log("[ERROR] JNI Native model initialization failed!")
                     ServerStatus.state.value = ServerState.ERROR

@@ -86,18 +86,22 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
     val targetFile = remember { File(context.filesDir, "model.gguf") }
     var isDownloaded by remember { mutableStateOf(targetFile.exists()) }
 
+    var useGpu by remember { 
+        mutableStateOf(context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).getBoolean("use_gpu", true)) 
+    }
+
     fun getDeviceTemperature(): Int {
-        // 1. Try reading battery temp from /sys/class/power_supply/battery/temp
+        // 1. Primary: Official Android SDK BatteryManager sticky intent (Works on 100% of devices without root/SELinux restriction)
         try {
-            val battFile = File("/sys/class/power_supply/battery/temp")
-            if (battFile.exists()) {
-                val raw = battFile.readText().trim().toInt()
-                val temp = if (raw > 1000) raw / 100 else if (raw > 100) raw / 10 else raw
-                if (temp in 15..85) return temp
+            val intent = context.registerReceiver(null, android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED))
+            val tempTenths = intent?.getIntExtra(android.os.BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
+            if (tempTenths > 0) {
+                val temp = tempTenths / 10
+                if (temp in 10..90) return temp
             }
         } catch (_: Exception) {}
 
-        // 2. Scan thermal zones 0 through 19 for a valid CPU/SoC thermal reading
+        // 2. Fallback: Scan thermal zones 0 through 19 for a valid CPU/SoC thermal reading
         for (i in 0..19) {
             try {
                 val f = File("/sys/class/thermal/thermal_zone$i/temp")
@@ -122,10 +126,27 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("Localhost Bridge Dashboard", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         
         Text("Hardware: $hardwareStats")
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+        ) {
+            Text("GPU Acceleration (Vulkan)", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                checked = useGpu,
+                onCheckedChange = { checked ->
+                    useGpu = checked
+                    context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        .edit().putBoolean("use_gpu", checked).apply()
+                }
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = modelUrl,

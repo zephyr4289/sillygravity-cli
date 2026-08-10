@@ -71,7 +71,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstring modelPath) {
+Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstring modelPath, jboolean useGpu) {
     const char* path = env->GetStringUTFChars(modelPath, 0);
     std::string pathStr(path);
     env->ReleaseStringUTFChars(modelPath, path);
@@ -80,28 +80,35 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
 
     llama_model_params model_params = llama_model_default_params();
     model_params.load_mode = LLAMA_LOAD_MODE_MMAP; // Allows OS to page weights safely
-    model_params.n_gpu_layers = 99; // Try Vulkan GPU offload first
 
-    LOGI("Attempting model load with Vulkan GPU acceleration...");
     bool gpuSuccess = false;
-    try {
-        g_model = llama_model_load_from_file(pathStr.c_str(), model_params);
-        if (g_model) {
-            gpuSuccess = true;
-            LOGI("Model loaded successfully with Vulkan GPU offload.");
+    if (useGpu) {
+        model_params.n_gpu_layers = 99; // Try Vulkan GPU offload
+        LOGI("Attempting model load with Vulkan GPU acceleration...");
+        try {
+            g_model = llama_model_load_from_file(pathStr.c_str(), model_params);
+            if (g_model) {
+                gpuSuccess = true;
+                LOGI("Model loaded successfully with Vulkan GPU offload.");
+            }
+        } catch (const std::exception& e) {
+            LOGE("Vulkan GPU load failed with exception: %s", e.what());
+            g_model = nullptr;
+        } catch (...) {
+            LOGE("Vulkan GPU load failed with unknown C++ exception.");
+            g_model = nullptr;
         }
-    } catch (const std::exception& e) {
-        LOGE("Vulkan GPU load failed with exception: %s", e.what());
-        g_model = nullptr;
-    } catch (...) {
-        LOGE("Vulkan GPU load failed with unknown C++ exception.");
-        g_model = nullptr;
+    } else {
+        LOGI("GPU Acceleration disabled by user request. Using CPU mode directly.");
+        llama_log_callback(GGML_LOG_LEVEL_INFO, "[INFO] GPU Acceleration disabled by user. Operating in ARM CPU mode.", nullptr);
     }
 
-    // Gracefully fall back to ARM CPU if Vulkan load failed or threw an exception
+    // Gracefully fall back to ARM CPU if GPU mode was not requested, failed, or threw an exception
     if (!g_model) {
-        LOGI("Falling back to CPU model loading...");
-        llama_log_callback(GGML_LOG_LEVEL_WARN, "[WARN] Vulkan GPU offload unsupported or failed. Falling back to CPU inference.", nullptr);
+        if (useGpu) {
+            LOGI("Falling back to CPU model loading...");
+            llama_log_callback(GGML_LOG_LEVEL_WARN, "[WARN] Vulkan GPU offload unsupported or failed. Falling back to CPU inference.", nullptr);
+        }
         
         model_params.n_gpu_layers = 0; // CPU only
         try {
