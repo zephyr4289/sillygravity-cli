@@ -12,6 +12,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,7 @@ class LLMService : Service() {
 
     external fun initEngine(modelPath: String): Boolean
     external fun destroyEngine()
+    external fun generateResponse(prompt: String): String
 
     override fun onCreate() {
         super.onCreate()
@@ -49,11 +51,19 @@ class LLMService : Service() {
         ktorServer = embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
             routing {
                 post("/v1/chat/completions") {
-                    // Simulating an SSE stream for completion
+                    val body = call.receiveText()
+                    // Hacky extraction of the last user prompt for demo purposes
+                    val promptRegex = "\"content\"\\s*:\\s*\"(.*?)\"".toRegex()
+                    val match = promptRegex.findAll(body).lastOrNull()
+                    val prompt = match?.groups?.get(1)?.value ?: "Hello!"
+                    
+                    val rawResponse = generateResponse(prompt)
+                    val responseText = rawResponse.replace("\n", "\\n").replace("\"", "\\\"")
+
                     call.respondTextWriter(contentType = io.ktor.http.ContentType.Text.EventStream) {
-                        write("data: {\"choices\":[{\"delta\":{\"content\":\"Hello from Android NDK!\"}}]}\n\n")
+                        write("data: {\"choices\":[{\"delta\":{\"content\":\"$responseText\"}}]}\n\n")
                         flush()
-                        delay(100)
+                        delay(10)
                         write("data: [DONE]\n\n")
                         flush()
                     }
