@@ -19,17 +19,10 @@ Java_com_example_llm_LLMService_initEngine(JNIEnv* env, jobject /* this */, jstr
     
     llama_backend_init();
 
-    // Aggressively pin to Prime/Performance cores (e.g., 6 and 7 on 8-core Snapdragon)
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    CPU_SET(6, &cpuset);
-    CPU_SET(7, &cpuset);
-    if (sched_setaffinity(0, sizeof(cpu_set_t), &cpuset) != 0) {
-        LOGE("Failed to pin threads to performance cores.");
-    }
+    llama_backend_init();
 
     llama_model_params model_params = llama_model_default_params();
-    model_params.load_mode = LLAMA_LOAD_MODE_MLOCK; // Prevent weights from being swapped to ZRAM/storage
+    model_params.load_mode = LLAMA_LOAD_MODE_MMAP; // Allows OS to page weights safely (equiv to use_mmap=true, use_mlock=false)
     model_params.n_gpu_layers = 99; // Maximize Vulkan offload
 
     g_model = llama_model_load_from_file(path, model_params);

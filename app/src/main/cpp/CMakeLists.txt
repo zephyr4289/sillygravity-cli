@@ -91,6 +91,7 @@ target_include_directories(llama-bridge PRIVATE
 target_link_libraries(llama-bridge
     llama
     ggml
+    vulkan
     log
     android
 )

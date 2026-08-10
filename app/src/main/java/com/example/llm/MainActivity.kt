@@ -56,6 +56,21 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+fun isGgufValid(file: File): Boolean {
+    if (!file.exists() || file.length() < 1000000) return false // Must be > 0 bytes
+    // Check GGUF Magic Header bytes (0x46 0x47 0x55 0x47 -> "GGUF")
+    return try {
+        file.inputStream().use { input ->
+            val header = ByteArray(4)
+            if (input.read(header) != 4) return false
+            val magic = String(header)
+            magic == "GGUF"
+        }
+    } catch (e: Exception) {
+        false
+    }
+}
+
 @Composable
 fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
     val context = LocalContext.current
@@ -126,6 +141,10 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
                             output.close()
                             input.close()
                             
+                            if (!isGgufValid(targetFile)) {
+                                throw Exception("Downloaded file is not a valid GGUF model!")
+                            }
+                            
                             context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE).edit().putString("model_path", targetFile.absolutePath).apply()
                             
                             withContext(Dispatchers.Main) {
@@ -150,7 +169,10 @@ fun DashboardScreen(onStartService: () -> Unit, onStopService: () -> Unit) {
                     else "Download"
                 ) 
             }
-            Button(onClick = onStartService) { Text("Start Server") }
+            Button(
+                onClick = onStartService,
+                enabled = isDownloaded && isGgufValid(targetFile)
+            ) { Text("Start Server") }
             Button(onClick = onStopService) { Text("Stop Server") }
         }
     }
